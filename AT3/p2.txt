@@ -1,0 +1,110 @@
+! vlan config each switch
+!!Access1, 2
+en
+config t
+vlan 10
+name HR
+exit
+vlan 20
+name Sales
+exit
+vlan 90
+name Management
+exit
+interface g0/1
+switchport mode trunk
+exit
+interface g0/2
+switchport mode trunk
+exit
+interface f0/1
+switchport mode access
+switchport access vlan 10
+exit
+interface f0/2
+switchport mode access
+switchport access vlan 20
+exit
+interface vlan 90
+ip address 172.16.128.<switch_specific_address> 255.255.192.0 ! unique IP address for each switch
+no shutdown
+exit
+ip default-gateway 172.16.128.1
+exit
+copy running-config startup-config
+
+
+!Access3
+interface f0/3
+switchport mode trunk
+exit
+interface vlan 90
+ip address 172.16.128.12 255.255.192.0 ! unique IP address for each switch
+no shutdown
+exit
+ip default-gateway 172.16.128.1
+exit
+copy running-config startup-config
+
+!Access port config
+
+!PT switch config
+configure terminal
+vlan 10
+name HR
+exit
+vlan 20
+name Sales
+exit
+vlan 90
+name Management
+exit
+interface f0/1
+switchport mode trunk
+exit
+interface f2/1
+switchport mode trunk
+exit
+
+
+ip address 172.16.128.20 255.255.192.0 
+no shutdown
+exit
+ip default-gateway 172.16.128.1
+exit
+copy running-config startup-config
+
+
+! Router Configuration example.
+configure terminal
+interface f0/0.10
+encapsulation dot1q 10
+ip address 172.16.0.1 255.255.192.0
+exit
+interface f0/0.20
+encapsulation dot1q 20
+ip address 172.16.64.1 255.255.192.0
+exit
+interface f0/0.90
+encapsulation dot1q 90
+ip address 172.16.128.1 255.255.192.0
+no shutdown
+exit
+
+
+
+!!check
+
+!!Verification Commands (Run on Switches):
+
+show vlan brief (Verify VLANs)
+show interfaces trunk (Verify trunk ports)
+show interfaces status (Verify interface status)
+show ip interface brief (Verify interface IP addresses)
+show ip route (Verify routing table)
+ping <IP_address> (Test connectivity)
+Verification Commands (Run on Router):
+
+show ip interface brief
+show ip route
+show interfaces trunk

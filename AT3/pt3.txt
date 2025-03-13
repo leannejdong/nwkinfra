@@ -1,0 +1,40 @@
+! Enable the physical interface
+interface GigabitEthernet0/0
+ no ip address
+ no shutdown
+!
+! Configure VLAN 10 (HR)
+interface GigabitEthernet0/0.10
+ encapsulation dot1q 10
+ ip address 192.168.10.1 255.255.255.0
+ no shutdown
+!
+! Configure VLAN 20 (Sales)
+interface GigabitEthernet0/0.20
+ encapsulation dot1q 20
+ ip address 172.16.20.1 255.255.255.0
+ no shutdown
+!
+! Configure VLAN 90 (Management)
+interface GigabitEthernet0/0.90
+ encapsulation dot1q 90
+ ip address 172.16.90.1 255.255.255.0
+ no shutdown
+!
+! Exit configuration mode
+exit
+
+
+/* summary
+
+enable: Enters privileged EXEC mode.
+configure terminal: Enters global configuration mode.
+interface GigabitEthernet0/0: Selects the physical interface.
+no ip address: Removes any existing IP address from the physical interface.
+no shutdown: Enables the interface.
+interface GigabitEthernet0/0.10, etc.: Selects the sub-interfaces.
+encapsulation dot1q <VLAN ID>: Configures VLAN encapsulation.
+ip address <IP address> <subnet mask>: Assigns the IP address and subnet mask.
+copy running-config startup-config: Saves the configuration.
+exit: Exits configuration modes.
+*/

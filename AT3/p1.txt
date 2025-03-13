@@ -1,0 +1,71 @@
+/*6. Set up the initial configuration of the switches and the router:
+
+a) Configure the hostname of each device. Use the labels in the diagram as your hostnames: Access1, Access2, Distrib1 etc.
+
+b) Configure the privileged password to be ‘class’ and the password console and vty password to be ‘cisco’
+
+c) For each switch, configure the virtual LAN interface 90 with an IP address from the Management subnetwork.
+
+d) Copy the running configuration of each device to start-up configuration.*/
+
+!Configure the hostname of each device Access1,2, 3 Distrib1,2, Router1 
+en
+config t
+hostname Access1
+
+!configure pwd.{priviledged, console, vty}
+
+config t
+enable secret class    
+
+
+line console 0
+password cisco
+login
+exit
+
+
+line vty 0 15
+password cisco
+login
+exit
+
+!Configure the virtual LAN interface 90 with an IP address from the Management subnetwork
+
+config t
+interface vlan 90
+ip address 172.16.128.10 255.255.192.0           !.10, .11, .12, .20, .21
+no shutdown
+ip default-gateway 172.16.128.1
+
+
+!Repeat for Access2 and Distrib1, changing the IP address to 192.168.90.12 and 192.168.90.13 respectively
+
+/*
+Router1 configuration of the VLAN 90 interface:
+On the router, the interface that connects to the management network will need to have the 192.168.90.1 address configured. If that interface is a layer 3 interface, simply assign the ip address. If that interface is a layer 2 interface, then a sub interface must be created.
+Example for a layer 3 interface*/
+
+config t
+interface g0/0 //replace g0/0 with the correct interface.
+ip address 192.168.90.1 255.255.255.0
+no shutdown
+exit
+
+!Enter privileged exec mode
+en
+
+!Copy the running configuration of each device to startup configuration
+copy running-config startup-config
+
+/*
+Important Notes:
+
+Security: Always use strong, unique passwords in a production environment.
+Subnet Planning: Adjust the IP addresses and subnet mask according to your network design.
+Interface Selection: Ensure you configure the correct interfaces on the router and switches.
+Testing: After configuring, test connectivity by pinging between devices in the Management subnet and from the devices to the router's VLAN 90 interface.
+VLAN Trunking: If your switches are connected with trunk links, ensure that VLAN 90 is allowed on those trunks.
+Router configuration: The router configuration will need to be configured with the correct interface that connects to the management network. If the router connects to the switches with trunk links, then sub interfaces will need to be created on the router.
+*/
+

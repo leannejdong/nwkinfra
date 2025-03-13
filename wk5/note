@@ -1,0 +1,38 @@
+!Troubleshooting vlan trunk
+
+S1: en
+show run
+config t
+ip default-gateway 192.168.99.1    !.1 means first available
+
+
+S3
+
+R1
+sh ip int bri
+
+switchport mode trunk
+switchport trunk native vlan 99
+
+
+do sh run | begin interface 
+
+
+S1
+int range g0/2, vlan 99
+
+vlan 99 up and down indicate trunk port not configured properly
+do sth int trunk
+
+trunk ports are the ports where traffic of multiple vlan goes through
+
+
+By default, everything allocated to vlan 1
+
+int g0/1
+switchport mode access
+switchport access vlan 10
+int f0/23
+switchport mode access
+switchport access vlan 20
+
