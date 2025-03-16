@@ -6,19 +6,19 @@ interface GigabitEthernet0/0
 ! Configure VLAN 10 (HR)
 interface GigabitEthernet0/0.10
  encapsulation dot1q 10
- ip address 192.168.10.1 255.255.255.0
+ ip address 172.16.10.1 255.255.192.0
  no shutdown
 !
 ! Configure VLAN 20 (Sales)
 interface GigabitEthernet0/0.20
  encapsulation dot1q 20
- ip address 172.16.20.1 255.255.255.0
+ ip address 172.16.20.1 255.255.192.0
  no shutdown
 !
 ! Configure VLAN 90 (Management)
 interface GigabitEthernet0/0.90
  encapsulation dot1q 90
- ip address 172.16.90.1 255.255.255.0
+ ip address 172.16.90.1 255.255.192.0
  no shutdown
 !
 ! Exit configuration mode

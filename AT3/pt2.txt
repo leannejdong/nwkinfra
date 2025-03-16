@@ -1,0 +1,168 @@
+Network Topology Review
+
+
+Switches:
+Distrib1 (Fa0/1, Fa1/1, Fa2/1)
+Distrib2 (Fa1/1, Fa2/2, Fa3/1)
+Access1 (Gig0/1, Gig0/2, Fa0/1, Fa0/2)
+Access2 (Gig0/1, Gig0/2, Fa0/1, Fa0/2)
+Access3 (Gig0/1, Fa0/1, Fa0/2, Fa0/3, Fa0/4, Fa0/5, Fa0/6)
+End Devices:
+PC-PT Sales1 (Fa0/2 on Access1)
+PC-PT HR1 (Fa0/1 on Access1)
+PC-PT HR2 (Fa0/1 on Access2)
+PC-PT Sales2 (Fa0/2 on Access2)
+Server-PT HR Server (Fa0/1 on Access3)
+Server-PT Sales Server (Fa0/2 on Access3)
+Access Router (Fa0/3 on Access3)
+
+Configuration Steps
+
+1. VLAN Configuration on Switches
+
+Dist1, Dist2, Access1, Access2, Access3
+enable
+configure terminal
+vlan 10
+name HR
+vlan 20
+name Sales
+vlan 90
+name Management
+exit
+
+2. Access Port Configuration
+
+!Access1(g0/1, g0/2, f0/1, f0/2)
+interface range f0/1,f0/2
+switchport mode access
+switchport access vlan 10  (for fa0/1)
+switchport access vlan 20  (for fa0/2)
+exit
+Access2
+interface range f0/1, f0/2
+switchport mode access
+switchport access vlan 10  (for fa0/1)
+switchport access vlan 20  (for fa0/2)
+exit
+Access3
+interface range fa0/1
+switchport mode access
+switchport access vlan 10
+exit
+interface fa0/2
+switchport mode access
+switchport access vlan 20
+exit
+
+3. Trunk Port Configuration
+
+Distrib1
+interface range fa0/1-f2/1
+switchport mode trunk
+exit
+Distrib2
+interface range fa1/1-f3/1
+switchport mode trunk
+exit
+Access1
+interface g0/1
+switchport mode trunk
+exit
+Access2
+interface g0/1
+switchport mode trunk
+exit
+Access3
+interface g0/1
+switchport mode trunk
+interface fa0/3
+switchport mode trunk
+exit
+
+4. Management VLAN Interface Configuration
+
+Access1
+interface range fa0/1-2
+switchport mode access
+switchport access vlan 20  !(for fa0/1 - Sales1)
+switchport access vlan 10  !(for fa0/2 - HR1)
+exit
+
+Access2:
+interface range fa0/1-2
+switchport mode access
+switchport access vlan 10  (for fa0/1 - HR2)
+switchport access vlan 20  (for fa0/2 - Sales2)
+exit
+
+Access3:
+interface fa0/1
+switchport mode access
+switchport access vlan 10  (for HR Server)
+exit
+interface fa0/2
+switchport mode access
+switchport access vlan 20  (for Sales Server)
+exit
+
+Trunk Port Configuration (Step 6 & 7)
+
+Distrib1:
+interface range f0/1 - f2/1
+switchport mode trunk
+exit
+
+Distrib2:
+interface range f0/1 - f2/1
+switchport mode trunk
+exit
+
+! Management plan interface ip address config
+Access1
+interface vlan 90
+ip address 172.16.90.10 255.255.0.0 (Change IP for each switch)
+no shutdown
+exit
+5. Default Gateway Configuration
+
+ip default-gateway 172.16.128.1
+
+
+6. Copy Running Configuration to Startup Configuration
+
+Dist1, Dist2, Access1, Access2, Access3
+copy running-config startup-config
+
+
+Verification Commands
+
+Show VLANs:
+show vlan brief
+This will display the VLANs configured on the switch, their names, and the ports assigned to them.
+
+Show Interface Status:
+show interfaces status
+This will show the status of each interface, including its VLAN assignment and mode (access or trunk).
+
+Show Trunk Interfaces:
+show interfaces trunk
+This will display the trunk interfaces and their allowed VLANs.
+
+Ping Test:
+From a PC in VLAN 10, ping another PC in VLAN 10. From a PC in VLAN 20, ping another PC in VLAN 20.
+
+ping <IP address of the target PC>
+Example: Access Router Configuration
+
+You'll need to configure the Access Router's Fa0/3 interface for trunking and assign an IP address to the Vlan90 subinterface.
+
+enable
+configure terminal
+interface fa0/3
+no shutdown
+encapsulation dot1q 90
+ip address 172.16.90.1 255.255.0.0
+no shutdown
+exit
+
