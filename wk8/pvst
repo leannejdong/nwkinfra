@@ -1,0 +1,110 @@
+!Configure basic seetings for each switch
+en
+config t
+!!Disable DNS lookup
+no ip domain-lookup
+!!configure device name as shown in topology
+hostname S1
+banner motd # Unauthorized Access is prohibited! #
+!!Assign cisco as the console and vty passwords and enable login
+service password-encryption		
+line vty 0 15
+password cisco
+login
+exit
+line con 0
+password cisco
+login
+exit
+!!Assign class as the encrypted priviledged exec mode password
+enable secret class
+!!Configure logging synchronous to prevent console messages
+line con 0
+logging synchronous
+exit
+!!shutdown all switch ports
+int range f0/1-24
+shutdown
+int ra g0/1-2
+shutdown
+!!Copy the running configuration to startup configuration.
+copy running-config startup-config
+
+!Configure VLANs, Native VLAN, and Trunks
+!!create vlans
+vlan 10
+ name User
+vlan 99
+ name Management
+exit
+
+!!!Repeat for S2, S3
+
+!Assign management ip address to vlan 99
+interface vlan 99
+ ip address 192.168.1.X 255.255.255.0  # Replace X with switch-specific IP
+ no shutdown
+exit
+
+!configure trunk links(interface range f0/1, f0/3)
+ switchport mode trunk
+ switchport trunk allowed vlan 10,99
+exit
+
+!configure root bridge for PVST+
+
+!! set root bridge on S1
+spanning-tree vlan 10 root primary
+spanning-tree vlan 99 root primary
+
+!! Set secondary root bridge on S2
+spanning-tree vlan 10 root secondary
+spanning-tree vlan 99 root secondary
+
+!Configure Rapid PVST+
+!!Configure Rapid PVST+ (S1, S2, S3)
+spanning-tree mode rapid-pvst
+
+!Enable PortFast on Edge Ports
+
+!!On S1 (PC-A is connected to f0/6):
+interface f0/6
+ switchport mode access
+ switchport access vlan 10
+ spanning-tree portfast
+exit
+!!On S3 (PC-C is connected to f0/18):
+interface f0/18
+ switchport mode access
+ switchport access vlan 10
+ spanning-tree portfast
+exit
+
+!Enable BPDU Guard on Edge Ports
+!!On S1 (PC-A on F0/6)
+interface f0/6
+ spanning-tree bpduguard enable
+exit
+!!On S3 (PC-C on F0/18)
+interface f0/18
+ spanning-tree bpduguard enable
+exit
+
+!Verify configuration
+show vlan br
+sh int trunk
+sh spanning-tree
+
+!!Verify PortFast Config
+show running-config | include portfast
+
+!!Verify BPDU Guard
+show spanning-tree interface f0/6 detail
+show spanning-tree interface f0/18 detail
+
+!!Save config
+writ memory
+
+
+
+

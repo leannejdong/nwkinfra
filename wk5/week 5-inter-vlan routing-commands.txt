@@ -1,0 +1,28 @@
+!!R1 inter-vlan routing commands
+
+int g0/0
+no ip address
+no shut
+
+int range g0/1-2
+no ip address
+shut
+
+int g0/0.10
+description GW for vlan 10
+encapsulation dot1q 10
+ip address 192.168.1.1 255.255.255.128
+int g0/0.20
+description GW for vlan 20
+encapsulation dot1q 20
+ip address 192.168.1.129 255.255.255.128
+int g0/0.99
+description GW for vlan 99
+encapsulation dot1q 99 native
+ip address 192.168.2.1 255.255.255.0
+
+!!S1 commands
+int g0/2
+ switchport mode trunk
+ switchport trunk native vlan 99
+
