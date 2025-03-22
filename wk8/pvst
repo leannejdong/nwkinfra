@@ -7,15 +7,17 @@ no ip domain-lookup
 hostname S1
 banner motd # Unauthorized Access is prohibited! #
 !!Assign cisco as the console and vty passwords and enable login
-service password-encryption		
+service password-encryption	
+line con 0
+password cisco
+login
+logging synchronous
+exit	
 line vty 0 15
 password cisco
 login
 exit
-line con 0
-password cisco
-login
-exit
+
 !!Assign class as the encrypted priviledged exec mode password
 enable secret class
 !!Configure logging synchronous to prevent console messages
@@ -47,6 +49,7 @@ interface vlan 99
 exit
 
 !configure trunk links(interface range f0/1, f0/3)
+int range f0/1, f0/3
  switchport mode trunk
  switchport trunk allowed vlan 10,99
 exit
