@@ -38,5 +38,21 @@ interface range GigabitEthernet 0/1 - 2
 shutdown
 exit
 
+! Configure IP addresses and subnet masks for VLAN 99 on each switch:
+interface vlan 99
+ip address 192.168.1.11 255.255.255.0  (For S1)
+no shutdown
+exit
+
+interface vlan 99
+ip address 192.168.1.12 255.255.255.0  (For S2)
+no shutdown
+exit
+
+interface vlan 99
+ip address 192.168.1.13 255.255.255.0  (For S3)
+no shutdown
+exit
+
 ! Copy the running configuration to the startup configuration:
 copy running-config startup-config
