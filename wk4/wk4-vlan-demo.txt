@@ -1,0 +1,108 @@
+
+
+!!S1 config
+
+en
+config t
+host S1
+
+no ip domain-loo
+
+line con 0
+ logg syn
+
+username admin1 pri 15 sec letmein
+
+line vty 0 4
+  login local
+  transport input telnet
+  exec-timeout 0 5
+
+vlan 10
+name HR
+vlan 20
+name SALES
+
+int range f0/1-10, g0/2
+  switchport mode access
+  switchport access vlan 10
+
+int range f0/11-20, f0/24
+  switchport mode access
+  switchport access vlan 20
+
+int g0/1
+  switchport mode trunk
+  switchport trunk native vlan 10
+  switchport trunk allowed vlan 1,10,20
+
+!!S2 config
+
+en
+config t
+host S2
+
+no ip domain-loo
+
+line con 0
+ logg syn
+
+username admin1 pri 15 sec letmein
+
+line vty 0 4
+  login local
+  transport input telnet
+  exec-timeout 0 5
+
+vlan 10
+name HR
+vlan 20
+name SALES
+
+int range f0/1-10
+  switchport mode access
+  switchport access vlan 10
+
+int range f0/11-20
+  switchport mode access
+  switchport access vlan 20
+
+int g0/1
+  switchport mode trunk
+  switchport trunk native vlan 10
+  switchport trunk allowed vlan 1,10,20
+
+show vlan brief
+show interface trunk
+
+
+!!R1 config
+
+en
+config t
+host R1
+
+no ip domain-loo
+
+line con 0
+ logg syn
+
+username admin1 pri 15 sec letmein
+
+line vty 0 4
+  login local
+  transport input telnet
+  exec-timeout 0 5
+
+int g0/0
+  description GW for VLAN 10
+  ip address 192.168.10.1 255.255.255.0
+  no shut
+
+
+int g0/1
+  description GW for VLAN 20
+  ip address 192.168.20.1 255.255.255.0
+  no shut
+ 
+

@@ -1,0 +1,216 @@
+
+
+!!!!this command is for PC not for the switch
+!!To find out the ip address and mac address on PC
+ipconfig /all
+
+!!To find out the arp cache on pc
+arp -a
+
+!!Switch commands
+!!Get into the privilege EXE mode
+enable
+
+!!Get into the global configuration mode
+configure terminal
+
+!!configure the hostname on switch
+hostname S1
+
+!!Disable the DNS lookup
+no ip domain-lookup
+
+!!configure console password
+line con 0
+  password cisco
+  login
+exit
+
+!!configure password to protect the privilege mode
+enable secret class
+
+!!cofigure telnet
+username admin privielge 15 secret letmein
+line vty 0 4
+  password letmein
+  login
+  transport input telnet
+  exec-timeout 0 5
+exit
+
+!!encrypt the plain-text password
+service password-encryption
+
+!!Save running-config to startup-config
+copy running-config startup-config
+!! Or you can use the command below
+write
+
+!!clean up the configuration on switch and reset it to factory default
+erase startup-config (or you can type "write erase")
+reload
+
+!!configure a banner message on switch
+banner motd #Unauthorised access is strictly prohibitted!#
+
+!!configure an ip adddress on default SVI interface
+interface vlan 1
+ ip address 192.168.1.2 255.255.255.0
+ no shutdown
+!!configure the default gateway for the switch
+ ip default-gateway 192.168.1.1
+
+!!inspect the ports status on a switch
+show ip interface brief
+
+!!encrypt all the passwords set on a switch
+service password-encryption
+
+!!inspect the running configruations on switch 
+do show running-config
+
+!!inspect the IoS version, memories size on switch
+show version
+
+!!inspect the mac address on an physical interface on a switch
+show interface G0/2
+
+!!inspect the mac address-table on switch to find out what mac addresses are conntected to the switchports
+show mac address-table
+
+!!inspect the arp cache on a switch
+show arp
+
+!!create VLANs on a switch and give it a name such as "IT"
+Vlan 10
+Name IT
+
+!!Allocate a switch port (e.g. Fa0/1) to a specific vlan such as "VLAN 10"
+
+interface fa0/1
+switchport mode access
+switchport access vlan 10
+
+!! Configure a switch port (e.g. g0/1) as trunk port
+interface g0/1 
+  switchport mode trunk
+!!change the native vlan settings on this trunk port
+  switchport trunk native vlan 99
+!!restrict only vlan 10,20 can be forwarded by this trunk port
+  switchport trunk allowed vlan 10,20 
+
+!!Inspect the VLANs that have been created on the switch and what interfaces have been allocated to which VLAN
+   show vlan
+   show vlan brief
+
+!!Inspect the trunk port that has been configured and the native vlan settings on the trunk port
+   show interface trunk
+
+!!Inspect a specific interface (e.g. f0/18) switchport settings. For example, is this port an access port or trunk port? If it is a trunk port, what is the native vlan setting on this port?
+   show interface f0/18 switchport
+
+!!Inter-VLAN routing configuration on a Router 
+!! For example, you need to configure R1's G0/0 with inter-vlan routing. You need to make R1's G0/0 act as the default gateway for VLAN 30 AND VLAN 40. VLAN 40 is the native VLAN.
+interface g0/0
+   no ip address 
+   no shut
+interface g0/0.30
+   encapsulation dot1q 30
+   ip address 192.168.30.1 255.255.255.0
+interface g0/0.40
+   encapsulation dot1q 40 native
+   ip address 192.168.40.1 255.255.255.0
+  
+!!Spanning-tree configuration on a switch
+!! Change the STP protocol to use RSTP
+   spanning-tree mode rapid-pvst
+!! Configure S1 as the primary root bridge for VLAN 10 and 20
+   spanning-tree vlan 10,20 root primary
+!! Configure S1 as the secondary root bridge for VLAN 30 and 40
+   Spanning-tree vlan 30,40 root secondary
+!! Change the spanning-tree priority value for a specific VLAN
+!! For example, change the VLAN 10 spanning-tree priority to 4096 
+   Spanning-tree vlan 10 priority 4096
+
+!!Inspect the spanning-tree settings on a switch 
+   show spanning-tree
+!! Inspect the spanning-tree settings for VLAN 10,20 on a switch
+   show spanning-tree vlan 10,20
+
+!!! Secure the ports on a switch
+!Configure port security on the Layered 2 access switch:
+
+!! Find out what mac addresses are connected on the switchports
+show mac address-table
+
+!! secure g0/2
+interface g0/2
+shutdown
+!! Enable port-security
+switchport port-security
+!! White list the server's mac address on interface g0/2
+switchport port-security mac-address xxxx.xxxx.xxxx
+
+!!or configure the sticky mode on an ordinary port that is used by an ordinary pc
+switchport port-security mac-address sticky
+
+!!configure there should be only one valid mac address to be attached to this particular interface 
+switchport port-security maximum 1
+!!configure the violation mode whenever the security policy is breached. There are three modes: shutdown, restrict, and protect
+switchport port-security violation shutdown
+no shut
+do show port-security interface g0/2
+ !!shutdown all the unused ports for security
+!! use the show command to find out all the unused ports on the switch
+do sh ip int bri | include down
+!! use the interface range command to shutdown the unused ports 
+interface range f0/2-24
+shutdown  
+
+
+!!Configure SSH on R1
+!! 1. Configure a minimum password length :
+
+config)# secuirty passwords min-length 10
+
+!! 2. Configure domain-name
+
+config)# ip domain-name ccnasecurity.com
+
+!! 3. Configure crypto keys for SSH
+
+config)# crypto key generate rsa general-keys modulus 1024
+
+!! 4. Configure a user account admin01
+
+ config)# username admin01 algorithm-type scrypt secret cisco12345
+
+!! 5. Configure line vty 0 4 to usee the local user database for authentication and restric access to SSH connection only
+
+config)# line vty 0 4
+cofig-line)# login local
+cofig-line)# transport input ssh
+config-line)# exec-timeout 5 0
+
+!! 6. Configure enable password with strong encryption 
+
+config)# enable algorithm-type scrypt secret class12345
+
+!! 7. use command "ssh -l admin01 192.168.10.1" from PC-A to verify ssh connection to R1
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!Configure PortFast and BPDU Guard on Access Mode ports:
+
+!!Two approaches:
+
+!!1. Configure portfast and bpduguard on interface 
+
+interface range f0/1-24
+spanning-tree portfast
+spanning-tree bpduguard enable
+
+!!2.Configure portfast and bpduguard in global configuraiton mode:
+
+spanning-tree portfast default
+spanning-tree portfast bpduguard default 
+ 

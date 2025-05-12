@@ -1,0 +1,50 @@
+1. Given ipv4 address and subnet, determine network address, broadcast address
+
+IP: 172.30.239.145
+Subnet mask: 255.255.192.0
+
+step 1: convert subnet to CIDR notation
+255: 11111111
+255: 11111111
+192: 11000000
+0: 00000000
+-> 18 bits ->/18
+
+CIDR notation: 172.30.239.145/18
+
+Step 2: /18 means the first 18 bits are the network, the rest are host.
+172: 10101100
+30: 00011110
+239: 11101111
+145: 10010001
+Keep the first 18 bits, zero out the rest we get 
+10101100.00011110.11000000.00000000=
+172.30.192.0
+
+Step 3: Determine the broadcast address
+Take the net addr and set all host bits (the remaining 14 bits) to 1
+172.30.192.0-> broadcast = 172.30.255.255
+
+Step 4: Calculate the number of usable hosts: 16382
+
+Host bits: 32-18 = 14
+Usable hosts = 2^14 - 2 = 16384 - 2 = 16382
+
+2. Work backward, given network address and subnet get the ip address
+
+Network address: 172.30.192.0/18
+
+step 1. ipv4 has 32 bits
+/18 means 18 bits are network bits and so leaving 14 bits as host addresses
+So 
+- Total host address = 2^14 = 16384
+- Usable host IPs = 2^14-2 = 16382 (subtract network and broadcast)
+
+step 2 Find the range of IPs
+The broadcast address is 172.30.255.255
+So 
+first host : 172.30.192.1
+last host: 172.30.255.254
+
+Any IP between 172.30.192.1 and 172.30.255.254 belongs to this /18 network
+
